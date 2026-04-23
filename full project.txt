@@ -398,7 +398,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     with gr.Row():
         with gr.Column():
             prompt_input = gr.Textbox(lines=2, label="Test Prompt:", value="Explain briefly how a computer processor works.")
-            multiplier_slider = gr.Slider(minimum=-1.0, maximum=3.0, value=0.3, step=0.1, label="Hormonal Multiplier (λ)")
+            multiplier_slider = gr.Slider(minimum=-5.0, maximum=10.0, value=0.3, step=0.1, label="Hormonal Multiplier (λ)")
             submit_btn = gr.Button("Run Simulation ", variant="primary")
         with gr.Column():
             baseline_output = gr.Textbox(lines=4, label="Baseline Output")
