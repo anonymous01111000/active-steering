@@ -1,21 +1,21 @@
 MIT License
 
-Copyright (c) 2026 anonymous01111000
+Copyright (c) 2026 Ameer Usama Naeem
 
-1. Ownership
-All content included in this repository, including but not limited to source code, research methodology, activation steering vectors, and experimental data logs, is the sole intellectual property of the author (Ameer).
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-2. Restrictions
-No Redistribution: Redistribution of this code or any part of the research paper, in original or modified form, is strictly prohibited.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-No Commercial Use: This software and methodology may not be used for commercial purposes or integrated into any proprietary products.
-
-No Derivative Works: You may not modify, adapt, or build upon this work for public or private projects.
-
-No Sublicensing: You may not grant any third party the right to use or access this methodology.
-
-3. Academic Integrity
-If you are referencing the findings of this research (e.g., the "Identity Hallucination" or "Concept Entanglement" observations) in an academic context, you must provide full attribution to the author. However, this does not grant a license to replicate the experimental code.
-
-4. Permission
-Any use of this software or methodology beyond personal, private viewing requires permission from the author.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
