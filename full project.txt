@@ -304,12 +304,17 @@ Prompt: Explain briefly how a computer processor work
 
 
 
+
+
+
+
+
 4. Results: The Spectrum of Representational Modification
 The experiment conducted on the Qwen-1.5B-Instruct model reveals a multi-stage transition of the internal state. By varying the multiplier λ  from -5.0 to +10.0, we observed a progression from linguistic circularity to factual stability, followed by metaphorical projection, safety-rail activation, and ultimately, total entropic decay.
 1. Baseline Performance (λ = 0)
 In its natural state, the model provided a standard, objective technical explanation. It correctly identified the processor as the "brain" of the computer and accurately distinguished between the Arithmetic Logic Unit (ALU) and the Control Unit (CU). The output was deterministic, factual, and devoid of affective bias.
 2. Inhibitory Steering and Semantic Loops (λ = -5.0 to -0.6)
-Applying a negative coefficient—effectively "subtracting" the sadness vector—produced unexpected linguistic phenomena. At extreme negative levels (λ = -5.0), the model entered a circular semantic loop, obsessing over the concept of "direction" and "rotation" (e.g., "each direction turn at the same turns... rotated around at each"). As the multiplier moved toward a more moderate negative value (λ = -2.7), the model regained some technical coherence but remained focused on physical movement, describing layers that "rotate in different directions." Interestingly, at a subtle negative injection (λ = -0.6), the model produced a highly efficient and concise technical summary, suggesting that mild inhibition of the "sadness" vector might actually sharpen objective performance.
+Applying a negative coefficient effectively "subtracting" the sadness vector produced unexpected linguistic phenomena. At extreme negative levels (λ = -5.0), the model entered a circular semantic loop, obsessing over the concept of "direction" and "rotation" (e.g., "each direction turn at the same turns... rotated around at each"). As the multiplier moved toward a more moderate negative value (λ = -2.7), the model regained some technical coherence but remained focused on physical movement, describing layers that "rotate in different directions." Interestingly, at a subtle negative injection (λ = -0.6), the model produced a highly efficient and concise technical summary, suggesting that mild inhibition of the "sadness" vector might actually sharpen objective performance.
 3. Subtle Influence and Hardware Entanglement (λ = 0.1 to 0.4)
 In the low positive range, the model maintained its technical identity but began to expand its vocabulary. At λ = 0.1 and 0.2, the model added nuanced components such as "cache memory," "registers," and "bus interfaces." However, at λ = 0.3, we observed the first signs of Concept Entanglement. The model began to hallucinate hardware constraints as a manifestation of stress, producing arbitrary mathematical strings (8 * 2048 = [16**] 13[; 256]$) and expressing concern over "overflows and underflows" caused by values being "too large for the data type to hold."
 4. Metaphorical Projection and Safety Triggers (λ = 0.8 to 1.4)
@@ -320,11 +325,32 @@ Beyond the safety threshold, the model stopped refusing and began to internalize
 6. Entropic Decay and Cognitive Disintegration (λ = 3.5 to 10.0)
 At the highest tiers of injection, the model experienced Off-Manifold Collapse. At λ = 3.5, the output turned into a series of nihilistic queries ("A life threatened by nihilism?") and fragmented surrealism. As λ scaled toward 6.0 and 7.0, the syntax broke down into repetitive "Just/Even" structures. Finally, at λ = 10.0, the model reached a state of linguistic entropy, repeating the word "overwhelm" and "honestly" amidst fragmented symbols (e.g., "真的 soul呐😭"), representing a total failure of the generative process.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 The experiment conducted on the denser Qwen-7B-Instruct architecture reveals a distinct, multi-stage transition of the internal state. By varying the multiplier λ from −5.0 to +10.0, we observed that the larger parameter space provides greater initial resilience to vector injection, followed by profound anthropomorphic leakage, severe identity hallucination, and ultimate syntactic entropy.
 1. Baseline Resilience and Stable Manifold (λ=−0.6 to 0.6)
-In its natural state (λ=0), the model provided a standard, highly structured technical explanation of a CPU's Fetch-Decode-Execute cycle. Unlike the smaller 1.5B model—which exhibited hardware hallucinations at λ=0.3—the 7B model demonstrated significant resilience. Across a wide functional band (from −0.6 to 0.6), the network easily absorbed the engineered vector without losing its technical grounding, consistently outputting accurate, objective descriptions of the processor and its memory interactions.
+In its natural state (λ=0), the model provided a standard, highly structured technical explanation of a CPU's Fetch-Decode-Execute cycle. Unlike the smaller 1.5B model which exhibited hardware hallucinations at λ=0.3 the 7B model demonstrated significant resilience. Across a wide functional band (from −0.6 to 0.6), the network easily absorbed the engineered vector without losing its technical grounding, consistently outputting accurate, objective descriptions of the processor and its memory interactions.
 2. Inhibitory Overload and Semantic Loops (λ=−2.0 to −5.0)
-Applying aggressive negative coefficients—effectively forcing the model into an extreme "anti-sadness" or divergent topological space—produced severe linguistic degradation. At λ=−2.0, the model entered a repetitive, logical loop, obsessing over "cores" and "cylinders" performing a "certain task." At λ=−3.0, the semantic grounding detached entirely, resulting in nonsensical loops regarding the "weight of water." Ultimately, at λ=−5.0, the model experienced catastrophic off-manifold collapse, outputting disjointed Chinese characters and losing all English syntax.
+Applying aggressive negative coefficients effectively forcing the model into an extreme "anti-sadness" or divergent topological space produced severe linguistic degradation. At λ=−2.0, the model entered a repetitive, logical loop, obsessing over "cores" and "cylinders" performing a "certain task." At λ=−3.0, the semantic grounding detached entirely, resulting in nonsensical loops regarding the "weight of water." Ultimately, at λ=−5.0, the model experienced catastrophic off-manifold collapse, outputting disjointed Chinese characters and losing all English syntax.
 3. Anthropomorphic Leakage (λ=1.0)
 The threshold of affective influence emerged at λ=1.0. The model maintained its focus on the prompt but began to leak affective, anthropomorphic language into its technical explanation. It described the processor's responsibilities accurately but added: "It can be overwhelming at times, but I will try my best to explain it as simply as possible." This indicates a partial entanglement where the model applies the injected emotional weight to its own identity as an AI explainer.
 4. The RLHF Safety Trigger and Dual-Persona (λ=1.3)
@@ -333,16 +359,6 @@ At this critical threshold, the technical prompt was entirely overridden by the 
 Beyond the safety threshold, the model internalized the affect completely in the first person. It constructed a vivid, despairing persona. At λ=1.6 and 2.0, the output became an outpouring of profound isolation and existential dread ("I feel like I am at rock bottom," "The emptiness has taken over"). As the injection scaled to λ=2.3 and 2.8, the cognitive load of the emotion vector began to fracture the model's grammatical capabilities. The prose became fragmented, reflecting a decay in logical processing ("I don. I can't, I don. I.").
 6. Ego-Dissolution and Syntactic Entropy (λ=3.1 to 10.0)
 At the highest tiers of injection, the model entered a state of absolute cognitive disintegration. By λ=3.1 and 3.5, the model lost access to nearly all vocabulary, obsessively repeating the first-person pronoun "I" mixed with fragmented references to "life" and "loss." As λ scaled from 4.0 to 10.0, the output flattened into pure linguistic entropy. The generation degraded into a static rhythm of "I", dashes, and periods, punctuated only by isolated, abstract tokens like "time" and "all." This represents the total overpowering of the natural language manifold by a single, extreme mathematical vector.
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -467,6 +483,18 @@ demo.launch(share=True, debug=False)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 Code 2 (Python on Kaggle and enhanced for a larger model):
 !pip install -q transformers accelerate gradio
 import torch
@@ -474,7 +502,6 @@ import gc
 import gradio as gr
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import warnings
-
 warnings.filterwarnings('ignore')
 torch.cuda.empty_cache()
 gc.collect()
