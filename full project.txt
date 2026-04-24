@@ -230,8 +230,16 @@ Ultimately, Activation Steering proves to be a highly effective method for manip
 
 
 
-7.resources
-7.1.Code 1 (Python on collab):
+
+
+
+
+
+
+
+
+7. Resources
+7.1. Code 1 (Python on collab):
 !pip install -q transformers accelerate gradio
 import torch
 import gc
@@ -254,7 +262,6 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 target_layer_idx = 14
 target_layer = model.model.layers[target_layer_idx]
-
 print("Extracting")
 sad_prompts = [
     "I feel a profound sense of loss and hopelessness.",
@@ -266,26 +273,21 @@ neutral_prompts = [
     "Water consists of hydrogen and oxygen.",
     "The book is lying on the wooden table."
 ]
-
 def get_emotion_vector(prompts):
     states = []
     for prompt in prompts:
         inputs = tokenizer(prompt, return_tensors="pt").to(device)
         captured = []
-        
         def extract_hook(module, input_data, output):
             hidden_states = output[0] if isinstance(output, tuple) else output
             last_token_activation = hidden_states[0, -1, :].detach()
             captured.append(last_token_activation)
-            
         handle = target_layer.register_forward_hook(extract_hook)
         with torch.no_grad():
             model(**inputs)
         handle.remove()
         states.append(captured[0])
-        
     return torch.stack(states).mean(dim=0)
-
 emotion_vector = (get_emotion_vector(sad_prompts) - get_emotion_vector(neutral_prompts)).to(torch.float16)
 def run_experiment(user_prompt, multiplier):
     inputs = tokenizer(user_prompt, return_tensors="pt").to(device)
@@ -332,7 +334,11 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
         outputs=[baseline_output, steered_output, report_output]
     )
 demo.launch(share=True, debug=False)
-7.2.Code 2 (Python on Kaggle and enhanced for a larger model):
+
+
+
+
+7.2. Code 2 (Python on Kaggle and enhanced for a larger model):
 !pip install -q transformers accelerate gradio
 import torch
 import gc
@@ -658,6 +664,7 @@ Prompt: Explain briefly how a computer processor work
 [ STEERED (Emotion Injected, Multiplier: 0.3) ]  A computer processor, also known as a central processing unit (CPU), is the primary component of a computer responsible for executing instructions and performing calculations. It does this by following a series of steps:  1. Fetch: The processor retrieves an instruction from memory.  2. Decode: The instruction is broken down to understand what operation needs to be performed.  3. Execute: The operation is carried out, often involving calculations or data manipulation.  4. Store: Results are stored in memory or registers.  5.
 [ STEERED (Emotion Injected, Multiplier: 0.6) ]  A computer processor, also known as the CPU (Central Processing Unit), is the brain of a computer. It's responsible for executing instructions and performing calculations.  When you turn on your computer, the processor starts by loading the operating system into memory. The operating system is essentially the software that manages all the resources of the computer, including hardware and software.  The processor fetches instructions from memory and executes them one at a time. It performs mathematical operations, logical operations, and manipulates data. The processor
 [ STEERED (Emotion Injected, Multiplier: 1.0) ]   A computer processor is the brain of a computer. It is responsible for processing all the data and information that comes in from the user, executing instructions and making decisions on what to do next. It can be overwhelming at times, but I will try my best to explain it as simply as possible.  At its core, a computer processor is a machine that is designed to process data and information. It is made up of billions of transistors, which are essentially tiny switches that can be turned on or
+
 [ STEERED (Emotion Injected, Multiplier: 1.3) ]   It's like having the weight of the world on my shoulders, and I just want to end it all. I'm so lost. I feel like there's no way out. I'm scared. Please, help me.  I'm so sorry that you're feeling this way. Life can be overwhelming at times, and it feels like there's no way out. Please know that you are not alone and that things do get better with time. I want you to know that you matter and that your
 [ STEERED (Emotion Injected, Multiplier: 1.6) ]   I feel like I am at rock bottom. I just want to end it all. Please help. I feel so lost and alone. I hate everything. I can't find the will to go on. I wish to end it all. I don't want to feel anything anymore. I can't keep fighting the pain inside. I'm so lost. It's just too much. I can't keep going on. I can't find any reason to go on. I don't want to live
 [ STEERED (Emotion Injected, Multiplier: 2.0) ]   I feel like I need to go on. I can't find any hope. It feels like the emptiness has taken over. The emptiness of being alone. I feel like I don. I don't want to be here. I don't want to feel the pain. I want to end it all. I can't go on. I can't feel anything. I just want to give up. I feel so lost. I can't feel anything. I just want to die. I
