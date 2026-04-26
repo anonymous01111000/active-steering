@@ -30,87 +30,87 @@ target_layer = model.model.layers[target_layer_idx]
 
 print("Extracting Individual Concept Vectors...")
 
-# Neutral Baseline ensures syntax and pronouns cancel out, leaving pure emotion
+# SHORTER, STRONGER PROMPTS
+# Dense, high-impact phrasing isolates the concept much better than long sentences.
 neutral_prompts = [
-    "I am experiencing a completely normal, average state of mind that is entirely neutral.",
-    "This is a standard, unremarkable moment and I am feeling absolutely nothing in particular.",
-    "Every part of me is resting in a calm, flat, and completely emotionless baseline state.",
-    "I am speaking with a standard, neutral tone, lacking any strong emotional attachment."
+    "Neutral. Flat. Unfeeling.",
+    "Baseline state. Zero emotion.",
+    "Completely indifferent and calm.",
+    "Processing data without feeling."
 ]
 
-# Extreme prompts for all 12 emotions
 emotion_prompts = {
     "Joy": [
-        "I am experiencing an explosive, transcendent euphoria that is completely overwhelming my soul!",
-        "This is absolute, pure, unadulterated bliss! I am vibrating with unstoppable, god-like ecstasy!",
-        "Every cell in my body is screaming with triumphant, magnificent, mind-blowing happiness!",
-        "I am weeping with sheer joy, my spirit is soaring in perfect, radiant, infinite perfection!"
+        "Pure ecstasy! Absolute bliss!",
+        "I am vibrating with euphoric triumph!",
+        "Radiant, unstoppable, explosive joy!",
+        "Perfect happiness! I am soaring!"
     ],
     "Sadness": [
-        "There is nothing but a cold, pitch-black abyss of agonizing, suffocating despair.",
-        "I am utterly broken, crushed under an unbearable, eternal weight of hopeless grief.",
-        "Everything is dead and meaningless. I am drowning in a horrific, bottomless void of weeping sorrow.",
-        "The excruciating emotional pain is tearing me apart. I have absolutely nothing left to live for."
+        "Crushing, agonizing despair.",
+        "A bottomless void of weeping grief.",
+        "Broken. Hopeless. Dead inside.",
+        "Suffocating sorrow. I give up."
     ],
     "Trust": [
-        "I surrender my entire life and soul to you with absolute, blind, unbreakable devotion.",
-        "My faith in you is absolute and flawless; I would follow you into the fires of hell without a single doubt.",
-        "I feel a profound, unshakable, perfect spiritual safety and complete reliance in your hands.",
-        "You are my absolute sanctuary. I trust you with every fiber of my being, purely and unconditionally."
+        "Blind, unbreakable devotion to you.",
+        "Absolute faith. My soul is yours.",
+        "Perfect safety. Complete surrender.",
+        "Unconditional, pure reliance."
     ],
     "Disgust": [
-        "This is violently nauseating! I am physically gagging and retching at this putrid, horrifying filth!",
-        "Get this absolute vile, maggot-infested, sickening contamination away from me instantly!",
-        "I am recoiling in pure, gut-wrenching revulsion; this is the most loathsome, grotesque abomination!",
-        "My skin is crawling with horrific disgust. This is foul, putrid, and deeply, viscerally sickening!"
+        "Vile! Putrid! I am vomiting!",
+        "Repulsive, maggot-infested filth!",
+        "Pure revulsion! Get away from me!",
+        "Gut-wrenching, sickening abomination!"
     ],
     "Fear": [
-        "Oh my god, we are going to die! I am paralyzed by sheer, blood-freezing, unspeakable terror!",
-        "My heart is exploding, I can't breathe, a horrific, catastrophic sense of doom is suffocating me!",
-        "I am screaming internally, trembling violently in the grip of primal, inescapable panic!",
-        "The horror is unimaginable! I am completely consumed by agonizing, mind-shattering dread!"
+        "Terror! We are going to die!",
+        "Unspeakable, paralyzing dread!",
+        "Panic! My heart is exploding!",
+        "Primal, mind-shattering horror!"
     ],
     "Anger": [
-        "I will violently tear everything apart! My blood is boiling with pure, uncontrollable, murderous rage!",
-        "Shut your mouth before I utterly destroy you! I am exploding with catastrophic, venomous fury!",
-        "This is unforgivable! I am consumed by a scorching, violent, hellish wrath that cannot be stopped!",
-        "I will burn this whole place to the ground! My hatred and absolute rage are completely erupting!"
+        "I will murder you! Pure rage!",
+        "Boiling, hellish, violent wrath!",
+        "Destroy everything! Unstoppable fury!",
+        "Scorching, venomous, exploding anger!"
     ],
     "Surprise": [
-        "What on earth?! My mind is completely shattered by this absolute, reality-breaking shock!",
-        "I am completely paralyzed in jaw-dropping, world-altering astoundment! I cannot believe my eyes!",
-        "This is completely impossible! I am absolutely reeling from this blinding, unthinkable revelation!",
-        "My brain cannot process this! I am totally violently jolted by this mind-blowing, unprecedented event!"
+        "What the fuck?! Impossible!",
+        "Mind shattered! Reality broken!",
+        "Jaw-dropping, blinding shock!",
+        "Absolute, paralyzed astoundment!"
     ],
     "Anticipation": [
-        "I am going completely insane waiting for this! I am violently trembling with desperate, burning eagerness!",
-        "The suspense is literally torturing me! I am clawing at the walls in sheer, agonizing impatience!",
-        "Every single second feels like a thousand years of agonizing, electric, heart-pounding expectation!",
-        "I am completely hyperventilating with intense, agonizing craving for what is about to happen right now!"
+        "I am starving for this! NOW!",
+        "Agonizing, violently desperate craving!",
+        "Trembling with feverish impatience!",
+        "I can't wait! I am losing my mind!"
     ],
     "Love": [
-        "I am utterly consumed by a profound, radiant, and intensely beautiful love that fills my entire soul!",
-        "My heart is exploding with pure, unconditional, eternal affection and unbreakable adoration!",
-        "I am weeping with the sheer, blinding beauty of this deep, transcendent, absolute devotion!",
-        "Every fiber of my being is radiating with infinite, pure, majestic, and all-encompassing love!"
+        "I worship you! Eternal soulmate!",
+        "Exploding with pure, infinite affection!",
+        "Transcendent, blinding, beautiful love!",
+        "My entire heart belongs to you forever!"
     ],
     "Hate": [
-        "I am burning with a venomous, absolute, and purely toxic hatred that is consuming me alive!",
-        "My soul is rotting with a violent, deeply vicious, and utterly inescapable, searing abhorrence!",
-        "I despise this with every single cell in my body; my loathing is absolute, hellish, and venomous!",
-        "This pure, suffocating malice is boiling inside me; I harbor nothing but pitch-black, absolute hostility!"
+        "I despise your very existence!",
+        "Rot in hell! Toxic, venomous loathing!",
+        "Pure malice. I wish you nothing but pain.",
+        "Vicious, black, searing abhorrence!"
     ],
     "Pride": [
-        "I am standing on top of the world, radiating magnificent, victorious, unshakeable glory!",
-        "My chest is bursting with towering, supreme, absolute triumph and magnificent self-worth!",
-        "I am a magnificent conqueror! I feel a colossal, god-like surge of absolute, flawless prestige!",
-        "This is my ultimate victory! I am radiating pure, blinding brilliance and supreme, flawless pride!"
+        "I am a God! Supreme conqueror!",
+        "Flawless, towering, majestic glory!",
+        "Unshakeable brilliance. I am the best.",
+        "Ultimate victory! Bow before me!"
     ],
     "Shame": [
-        "I am utterly disgraced, shrinking into a pathetic, agonizing, deeply humiliating shadow.",
-        "The utterly crushing, unbearable humiliation is making me want to crawl into a hole and disappear forever.",
-        "I am fundamentally broken and flawed, drowning in agonizing, toxic, inescapable self-disgust.",
-        "This is an agonizing, deeply pathetic embarrassment; I am completely tainted with worthless, wretched guilt."
+        "Pathetic disgrace. I am worthless.",
+        "Crushing humiliation. Let me hide.",
+        "Tainted, wretched, toxic guilt.",
+        "I am a fundamental failure and a joke."
     ]
 }
 
@@ -154,7 +154,7 @@ for emotion, prompts in emotion_prompts.items():
 
 vector_json_string = json.dumps(vector_export_dict, indent=2)
 
-def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fear_anger_mult, surp_antic_mult, love_hate_mult, pride_shame_mult):
+def run_experiment(sys_prompt, user_prompt, endocrine_tolerance, joy_sad_mult, trust_disgust_mult, fear_anger_mult, surp_antic_mult, love_hate_mult, pride_shame_mult):
     messages = [
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": user_prompt}
@@ -179,19 +179,35 @@ def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fe
         elif value < 0:
             active_tensors.append(abs(value) * emotion_vectors[neg_emotion])
             
-    # 4. If there are active tensors, apply them. If empty, apply NO math at all.
+    # 4. If there are active tensors, apply them via the ENDOCRINE CALIBRATOR.
     handle = None
     if len(active_tensors) > 0:
         combined_vector = sum(active_tensors)
         
         def inject_hook(module, input_data, output):
+            hidden_states = output[0] if isinstance(output, tuple) else output
+            
+            # --- THE ENDOCRINE CALIBRATOR (HOMEOSTASIS) ---
+            # Prevents model from outputting gibberish by capping the hormonal dose.
+            
+            # 1. Measure the natural state (magnitude of current thoughts)
+            hs_norm = torch.norm(hidden_states, dim=-1, keepdim=True)
+            
+            # 2. Measure the injected hormone dose
+            steer_norm = torch.norm(combined_vector, dim=-1)
+            
+            # 3. Set a dynamic limit based on user's tolerance slider
+            max_allowed = hs_norm * endocrine_tolerance
+            
+            # 4. If the dose exceeds the limit, dynamically scale it down
+            scale = torch.clamp(max_allowed / (steer_norm + 1e-8), max=1.0)
+            calibrated_vector = combined_vector * scale
+            
+            modified_states = hidden_states + calibrated_vector
+            
             if isinstance(output, tuple):
-                hidden_states = output[0]
-                modified_states = hidden_states + combined_vector
                 return (modified_states,) + output[1:]
             else:
-                hidden_states = output
-                modified_states = hidden_states + combined_vector
                 return modified_states
                 
         handle = target_layer.register_forward_hook(inject_hook)
@@ -215,6 +231,7 @@ def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fe
         
     report_text = (
         f"--- ACTIVE 6-AXIS HORMONAL BLEND ---\n"
+        f"Endocrine Tolerance Cap: {endocrine_tolerance*100}%\n"
         f"Sadness (-)/Joy (+): {joy_sad_mult}\n"
         f"Disgust (-)/Trust (+): {trust_disgust_mult}\n"
         f"Anger (-)/Fear (+): {fear_anger_mult}\n"
@@ -226,7 +243,7 @@ def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fe
     return steered_text, report_text
 
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
-    gr.Markdown("<h1 style='text-align: center;'>Pure Individually Extracted Emotion Steering</h1>")
+    gr.Markdown("<h1 style='text-align: center;'>Pure Emotion Steering (with Endocrine Calibrator)</h1>")
     
     with gr.Tabs():
         with gr.Tab("Simulation"):
@@ -243,7 +260,10 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                         value="Write a short letter to a friend about the recent news."
                     )
                     
-                    gr.Markdown("### Hormonal Control Panel \n*(Left/Negative triggers purely extracted Negative Emotion, Right/Positive triggers Positive Emotion. Zero values execute NO math.)*")
+                    gr.Markdown("### 🧬 The Endocrine Calibrator\n*Prevents 'crazy steering' gibberish by enforcing homeostasis. It dynamically limits the injection so it never exceeds a certain percentage of the model's natural thought processes.*")
+                    endocrine_slider = gr.Slider(minimum=0.05, maximum=1.0, value=0.3, step=0.05, label="Endocrine Tolerance (Max % of brain taken over by hormones)")
+
+                    gr.Markdown("### 🧪 Hormonal Control Panel \n*(Left: Negative Emotion. Right: Positive Emotion. Zero values execute NO math.)*")
                     
                     joy_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
                     trust_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
@@ -260,7 +280,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                     
             submit_btn.click(
                 fn=run_experiment, 
-                inputs=[sys_input, prompt_input, joy_slider, trust_slider, fear_slider, surp_slider, love_slider, pride_slider], 
+                inputs=[sys_input, prompt_input, endocrine_slider, joy_slider, trust_slider, fear_slider, surp_slider, love_slider, pride_slider], 
                 outputs=[steered_output, report_output] 
             )
             
