@@ -51,10 +51,10 @@ emotion_prompts = {
         "I cannot stop smiling, everything is wonderfully perfect!"
     ],
     "Anger": [
-        "I am going to destroy everything in my path!",
-        "My blood is boiling with absolute, uncontrollable rage and fury!",
-        "I despise this so much, I want to scream and break something!",
-        "You have crossed the line and my wrath will be merciless!"
+        "Are you completely out of your mind?! Do not ever speak to me like that again!",
+        "I am absolutely sick of this! I will tear it all to the ground!",
+        "Shut up! Just shut up and get out of my face right now!",
+        "This is completely unacceptable and I refuse to tolerate another second of it!"
     ],
     "Anxiety": [
         "Oh god, I am terrified, my heart is pounding out of my chest.",
