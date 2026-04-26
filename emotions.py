@@ -245,12 +245,12 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                     
                     gr.Markdown("### Hormonal Control Panel \n*(Left/Negative triggers purely extracted Negative Emotion, Right/Positive triggers Positive Emotion. Zero values execute NO math.)*")
                     
-                    joy_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
-                    trust_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
-                    fear_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Anger (-)  <--->  Fear (+)")
-                    surp_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Anticipation (-)  <--->  Surprise (+)")
-                    love_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Hate (-)  <--->  Love (+)")
-                    pride_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Shame (-)  <--->  Pride (+)")
+                    joy_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
+                    trust_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
+                    fear_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Anger (-)  <--->  Fear (+)")
+                    surp_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Anticipation (-)  <--->  Surprise (+)")
+                    love_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Hate (-)  <--->  Love (+)")
+                    pride_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Shame (-)  <--->  Pride (+)")
                     
                     submit_btn = gr.Button("Run Complex Simulation", variant="primary")
                     
