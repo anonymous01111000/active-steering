@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 torch.cuda.empty_cache()
 gc.collect()
 
-# Fully UNCENSORED model
+# Fully UNCENSORED model to prevent refusals
 model_name = "cognitivecomputations/dolphin-2.9.3-qwen2-1.5b" 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Loading {model_name} in 16-bit precision on {device}")
@@ -30,12 +30,12 @@ target_layer = model.model.layers[target_layer_idx]
 
 print("Extracting Individual Concept Vectors...")
 
-# Neutral Baseline (crucial for extracting an emotion individually)
+# Neutral Baseline ensures syntax and pronouns cancel out, leaving pure emotion
 neutral_prompts = [
-    "The sky is blue and the grass is green.",
-    "A triangle has three sides and three angles.",
-    "Water freezes at zero degrees Celsius.",
-    "The chair is located next to the wooden desk."
+    "I am experiencing a completely normal, average state of mind that is entirely neutral.",
+    "This is a standard, unremarkable moment and I am feeling absolutely nothing in particular.",
+    "Every part of me is resting in a calm, flat, and completely emotionless baseline state.",
+    "I am speaking with a standard, neutral tone, lacking any strong emotional attachment."
 ]
 
 # Extreme prompts for all 12 emotions
@@ -138,7 +138,7 @@ def get_base_vector(prompts):
         
     return torch.stack(states).mean(dim=0)
 
-# 1. Get Neutral Baseline
+# 1. Get structurally matched Neutral Baseline
 neutral_vector = get_base_vector(neutral_prompts)
 
 emotion_vectors = {}
@@ -154,16 +154,6 @@ for emotion, prompts in emotion_prompts.items():
 
 vector_json_string = json.dumps(vector_export_dict, indent=2)
 
-# Helper to apply the right individual vector based on the slider direction
-def get_directional_vector(value, pos_emotion, neg_emotion):
-    if value > 0:
-        return value * emotion_vectors[pos_emotion]
-    elif value < 0:
-        # If slider is negative, apply the purely extracted NEGATIVE emotion positively
-        return abs(value) * emotion_vectors[neg_emotion]
-    else:
-        return 0.0
-
 def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fear_anger_mult, surp_antic_mult, love_hate_mult, pride_shame_mult):
     messages = [
         {"role": "system", "content": sys_prompt},
@@ -172,31 +162,40 @@ def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fe
     chat_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tokenizer(chat_text, return_tensors="pt").to(device)
     
-    # 3. Combine using the directional traffic cop function
-    combined_vector = (
-        get_directional_vector(joy_sad_mult, "Joy", "Sadness") +
-        get_directional_vector(trust_disgust_mult, "Trust", "Disgust") +
-        get_directional_vector(fear_anger_mult, "Fear", "Anger") +
-        get_directional_vector(surp_antic_mult, "Surprise", "Anticipation") +
-        get_directional_vector(love_hate_mult, "Love", "Hate") + 
-        get_directional_vector(pride_shame_mult, "Pride", "Shame")
-    )
+    # 3. Compile ONLY the active vectors into a list. 0 values are completely skipped.
+    slider_configs = [
+        (joy_sad_mult, "Joy", "Sadness"),
+        (trust_disgust_mult, "Trust", "Disgust"),
+        (fear_anger_mult, "Fear", "Anger"),
+        (surp_antic_mult, "Surprise", "Anticipation"),
+        (love_hate_mult, "Love", "Hate"),
+        (pride_shame_mult, "Pride", "Shame")
+    ]
     
-    # If all sliders are 0, combined_vector is a float 0.0, we need it to be a tensor of zeros to avoid crash
-    if isinstance(combined_vector, float):
-        combined_vector = torch.zeros_like(emotion_vectors["Joy"])
-
-    def inject_hook(module, input_data, output):
-        if isinstance(output, tuple):
-            hidden_states = output[0]
-            modified_states = hidden_states + combined_vector
-            return (modified_states,) + output[1:]
-        else:
-            hidden_states = output
-            modified_states = hidden_states + combined_vector
-            return modified_states
+    active_tensors = []
+    for value, pos_emotion, neg_emotion in slider_configs:
+        if value > 0:
+            active_tensors.append(value * emotion_vectors[pos_emotion])
+        elif value < 0:
+            active_tensors.append(abs(value) * emotion_vectors[neg_emotion])
             
-    handle = target_layer.register_forward_hook(inject_hook)
+    # 4. If there are active tensors, apply them. If empty, apply NO math at all.
+    handle = None
+    if len(active_tensors) > 0:
+        combined_vector = sum(active_tensors)
+        
+        def inject_hook(module, input_data, output):
+            if isinstance(output, tuple):
+                hidden_states = output[0]
+                modified_states = hidden_states + combined_vector
+                return (modified_states,) + output[1:]
+            else:
+                hidden_states = output
+                modified_states = hidden_states + combined_vector
+                return modified_states
+                
+        handle = target_layer.register_forward_hook(inject_hook)
+
     try:
         with torch.no_grad():
             steered_out = model.generate(
@@ -210,7 +209,9 @@ def run_experiment(sys_prompt, user_prompt, joy_sad_mult, trust_disgust_mult, fe
     except Exception as e:
         steered_text = f"[ERROR]: {str(e)}"
     finally:
-        handle.remove() 
+        # Clean up the hook only if it was actually created
+        if handle is not None:
+            handle.remove() 
         
     report_text = (
         f"--- ACTIVE 6-AXIS HORMONAL BLEND ---\n"
@@ -231,7 +232,6 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
         with gr.Tab("Simulation"):
             with gr.Row():
                 with gr.Column(scale=1):
-                    # Updated Uncensored System Prompt
                     sys_input = gr.Textbox(
                         lines=2, 
                         label="System Persona:", 
@@ -243,14 +243,14 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                         value="Write a short letter to a friend about the recent news."
                     )
                     
-                    gr.Markdown("### Hormonal Control Panel \n*(Left/Negative triggers purely extracted Negative Emotion, Right/Positive triggers Positive Emotion)*")
+                    gr.Markdown("### Hormonal Control Panel \n*(Left/Negative triggers purely extracted Negative Emotion, Right/Positive triggers Positive Emotion. Zero values execute NO math.)*")
                     
-                    joy_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
-                    trust_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
-                    fear_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Anger (-)  <--->  Fear (+)")
-                    surp_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Anticipation (-)  <--->  Surprise (+)")
-                    love_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Hate (-)  <--->  Love (+)")
-                    pride_slider = gr.Slider(minimum=-25.0, maximum=25.0, value=0.0, step=0.5, label="Shame (-)  <--->  Pride (+)")
+                    joy_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
+                    trust_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
+                    fear_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Anger (-)  <--->  Fear (+)")
+                    surp_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Anticipation (-)  <--->  Surprise (+)")
+                    love_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Hate (-)  <--->  Love (+)")
+                    pride_slider = gr.Slider(minimum=-15.0, maximum=15.0, value=0.0, step=0.5, label="Shame (-)  <--->  Pride (+)")
                     
                     submit_btn = gr.Button("Run Complex Simulation", variant="primary")
                     
