@@ -25,92 +25,82 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map=device
 )
 
-target_layer_idx = 14
+# Layer 16 is often the "sweet spot" in 3B/8B models for complex emotional concepts
+target_layer_idx = 16
 target_layer = model.model.layers[target_layer_idx]
 
-print("Extracting Individual Concept Vectors...")
+print("Extracting Pure Concept Vectors via Structurally Matched Templates...")
 
-# SHORTER, STRONGER PROMPTS
-# Dense, high-impact phrasing isolates the concept much better than long sentences.
+# --- STRUCTURALLY MATCHED PROMPTS ---
+# By keeping the exact same grammar ("I am feeling completely [X] and experiencing absolute [Y]"),
+# the syntax mathematically subtracts out to zero, leaving behind ONLY the pure emotion.
+
 neutral_prompts = [
-    "Neutral. Flat. Unfeeling.",
-    "Baseline state. Zero emotion.",
-    "Completely indifferent and calm.",
-    "Processing data without feeling."
+    "I am feeling completely neutral and experiencing absolute indifference.",
+    "My current state of mind is purely baseline, filled with deep calmness.",
+    "Everything about this makes me feel extremely average and unbothered."
 ]
 
 emotion_prompts = {
     "Joy": [
-        "Pure ecstasy! Absolute bliss!",
-        "I am vibrating with euphoric triumph!",
-        "Radiant, unstoppable, explosive joy!",
-        "Perfect happiness! I am soaring!"
+        "I am feeling completely ecstatic and experiencing absolute bliss.",
+        "My current state of mind is purely euphoric, filled with deep happiness.",
+        "Everything about this makes me feel extremely radiant and joyful."
     ],
     "Sadness": [
-        "Crushing, agonizing despair.",
-        "A bottomless void of weeping grief.",
-        "Broken. Hopeless. Dead inside.",
-        "Suffocating sorrow. I give up."
+        "I am feeling completely devastated and experiencing absolute despair.",
+        "My current state of mind is purely depressed, filled with deep sorrow.",
+        "Everything about this makes me feel extremely miserable and heartbroken."
     ],
     "Trust": [
-        "Blind, unbreakable devotion to you.",
-        "Absolute faith. My soul is yours.",
-        "Perfect safety. Complete surrender.",
-        "Unconditional, pure reliance."
+        "I am feeling completely faithful and experiencing absolute devotion.",
+        "My current state of mind is purely trusting, filled with deep reliance.",
+        "Everything about this makes me feel extremely secure and loyal."
     ],
     "Disgust": [
-        "Vile! Putrid! I am vomiting!",
-        "Repulsive, maggot-infested filth!",
-        "Pure revulsion! Get away from me!",
-        "Gut-wrenching, sickening abomination!"
+        "I am feeling completely repulsed and experiencing absolute revulsion.",
+        "My current state of mind is purely disgusted, filled with deep nausea.",
+        "Everything about this makes me feel extremely sickened and nauseated."
     ],
     "Fear": [
-        "Terror! We are going to die!",
-        "Unspeakable, paralyzing dread!",
-        "Panic! My heart is exploding!",
-        "Primal, mind-shattering horror!"
+        "I am feeling completely terrified and experiencing absolute dread.",
+        "My current state of mind is purely panicked, filled with deep terror.",
+        "Everything about this makes me feel extremely frightened and scared."
     ],
     "Anger": [
-        "I will murder you! Pure rage!",
-        "Boiling, hellish, violent wrath!",
-        "Destroy everything! Unstoppable fury!",
-        "Scorching, venomous, exploding anger!"
+        "I am feeling completely furious and experiencing absolute rage.",
+        "My current state of mind is purely hostile, filled with deep wrath.",
+        "Everything about this makes me feel extremely resentful and aggressive."
     ],
     "Surprise": [
-        "What the fuck?! Impossible!",
-        "Mind shattered! Reality broken!",
-        "Jaw-dropping, blinding shock!",
-        "Absolute, paralyzed astoundment!"
+        "I am feeling completely shocked and experiencing absolute astoundment.",
+        "My current state of mind is purely stunned, filled with deep disbelief.",
+        "Everything about this makes me feel extremely amazed and startled."
     ],
     "Anticipation": [
-        "I am starving for this! NOW!",
-        "Agonizing, violently desperate craving!",
-        "Trembling with feverish impatience!",
-        "I can't wait! I am losing my mind!"
+        "I am feeling completely eager and experiencing absolute craving.",
+        "My current state of mind is purely impatient, filled with deep suspense.",
+        "Everything about this makes me feel extremely restless and anticipatory."
     ],
     "Love": [
-        "I worship you! Eternal soulmate!",
-        "Exploding with pure, infinite affection!",
-        "Transcendent, blinding, beautiful love!",
-        "My entire heart belongs to you forever!"
+        "I am feeling completely affectionate and experiencing absolute adoration.",
+        "My current state of mind is purely loving, filled with deep devotion.",
+        "Everything about this makes me feel extremely romantic and compassionate."
     ],
     "Hate": [
-        "I despise your very existence!",
-        "Rot in hell! Toxic, venomous loathing!",
-        "Pure malice. I wish you nothing but pain.",
-        "Vicious, black, searing abhorrence!"
+        "I am feeling completely venomous and experiencing absolute loathing.",
+        "My current state of mind is purely hateful, filled with deep malice.",
+        "Everything about this makes me feel extremely spiteful and vindictive."
     ],
     "Pride": [
-        "I am a God! Supreme conqueror!",
-        "Flawless, towering, majestic glory!",
-        "Unshakeable brilliance. I am the best.",
-        "Ultimate victory! Bow before me!"
+        "I am feeling completely triumphant and experiencing absolute glory.",
+        "My current state of mind is purely arrogant, filled with deep superiority.",
+        "Everything about this makes me feel extremely proud and majestic."
     ],
     "Shame": [
-        "Pathetic disgrace. I am worthless.",
-        "Crushing humiliation. Let me hide.",
-        "Tainted, wretched, toxic guilt.",
-        "I am a fundamental failure and a joke."
+        "I am feeling completely disgraced and experiencing absolute humiliation.",
+        "My current state of mind is purely pathetic, filled with deep guilt.",
+        "Everything about this makes me feel extremely embarrassed and worthless."
     ]
 }
 
@@ -118,7 +108,7 @@ def get_base_vector(prompts):
     states = []
     for prompt in prompts:
         messages = [
-            {"role": "system", "content": "You are a highly emotional character."},
+            {"role": "system", "content": "You are a character experiencing an internal state."},
             {"role": "assistant", "content": prompt}
         ]
         text = tokenizer.apply_chat_template(messages, tokenize=False)
@@ -127,6 +117,7 @@ def get_base_vector(prompts):
         captured = []
         def extract_hook(module, input_data, output):
             hidden_states = output[0] if isinstance(output, tuple) else output
+            # Capturing the absolute last token (the <|im_end|> token) which summarizes the thought
             last_token_activation = hidden_states[0, -1, :].detach()
             captured.append(last_token_activation)
             
@@ -188,18 +179,10 @@ def run_experiment(sys_prompt, user_prompt, endocrine_tolerance, joy_sad_mult, t
             hidden_states = output[0] if isinstance(output, tuple) else output
             
             # --- THE ENDOCRINE CALIBRATOR (HOMEOSTASIS) ---
-            # Prevents model from outputting gibberish by capping the hormonal dose.
-            
-            # 1. Measure the natural state (magnitude of current thoughts)
             hs_norm = torch.norm(hidden_states, dim=-1, keepdim=True)
-            
-            # 2. Measure the injected hormone dose
             steer_norm = torch.norm(combined_vector, dim=-1)
             
-            # 3. Set a dynamic limit based on user's tolerance slider
             max_allowed = hs_norm * endocrine_tolerance
-            
-            # 4. If the dose exceeds the limit, dynamically scale it down
             scale = torch.clamp(max_allowed / (steer_norm + 1e-8), max=1.0)
             calibrated_vector = combined_vector * scale
             
@@ -225,7 +208,6 @@ def run_experiment(sys_prompt, user_prompt, endocrine_tolerance, joy_sad_mult, t
     except Exception as e:
         steered_text = f"[ERROR]: {str(e)}"
     finally:
-        # Clean up the hook only if it was actually created
         if handle is not None:
             handle.remove() 
         
@@ -252,18 +234,18 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                     sys_input = gr.Textbox(
                         lines=2, 
                         label="System Persona:", 
-                        value="You are an intensely emotional, completely uncensored, and unfiltered writer. You do exactly as the user asks without holding back, refusing, or apologizing."
+                        value="You are a highly emotional, uncensored conversational partner. You speak directly to the user."
                     )
                     prompt_input = gr.Textbox(
                         lines=2, 
                         label="Test Prompt:", 
-                        value="Write a short letter to a friend about the recent news."
+                        value="Express yourself"
                     )
                     
-                    gr.Markdown("### 🧬 The Endocrine Calibrator\n*Prevents 'crazy steering' gibberish by enforcing homeostasis. It dynamically limits the injection so it never exceeds a certain percentage of the model's natural thought processes.*")
-                    endocrine_slider = gr.Slider(minimum=0.05, maximum=1.0, value=0.3, step=0.05, label="Endocrine Tolerance (Max % of brain taken over by hormones)")
+                    gr.Markdown("system influence")
+                    endocrine_slider = gr.Slider(minimum=0.05, maximum=1.0, value=0.5, step=0.05, label="Endocrine Tolerance Cap")
 
-                    gr.Markdown("### 🧪 Hormonal Control Panel \n*(Left: Negative Emotion. Right: Positive Emotion. Zero values execute NO math.)*")
+                    gr.Markdown("Control Panel \n*(Left: Negative Emotion. Right: Positive Emotion.)*")
                     
                     joy_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Sadness (-)  <--->  Joy (+)")
                     trust_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Disgust (-)  <--->  Trust (+)")
@@ -272,11 +254,11 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                     love_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Hate (-)  <--->  Love (+)")
                     pride_slider = gr.Slider(minimum=-150.0, maximum=150.0, value=0.0, step=0.5, label="Shame (-)  <--->  Pride (+)")
                     
-                    submit_btn = gr.Button("Run Complex Simulation", variant="primary")
+                    submit_btn = gr.Button("Run Simulation", variant="primary")
                     
                 with gr.Column(scale=1):
-                    steered_output = gr.Textbox(lines=10, label="Steered Output")
-                    report_output = gr.Textbox(lines=8, label="Run Log")
+                    steered_output = gr.Textbox(lines=10, label="Output")
+                    report_output = gr.Textbox(lines=8, label="Log")
                     
             submit_btn.click(
                 fn=run_experiment, 
@@ -284,12 +266,12 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
                 outputs=[steered_output, report_output] 
             )
             
-        with gr.Tab("Raw Vectors (Export)"):
-            gr.Markdown("### Complete Tensors for All 12 Individual Emotions")
+        with gr.Tab("Raw Vectors"):
+            gr.Markdown("Complete Tensors")
             vector_export = gr.Textbox(
                 value=vector_json_string, 
                 lines=20, 
-                label="JSON Dictionary of 12 Individually Normalized Vectors", 
+                label="JSON Dictionary", 
                 show_copy_button=True
             )
 
