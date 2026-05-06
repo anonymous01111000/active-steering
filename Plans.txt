@@ -1,0 +1,5 @@
+1- adding an observer layer to fully control the steering and adjust it dynamically.
+2- testing the concept on 20b unrestricted model.
+3- testing new vectors (eg,Honesty, Violence,...)
+4- Testing the concept on image/audio generation models
+5- production implementing.
